@@ -27,12 +27,28 @@ switch (akina_option('feature_align')) {
 if( $i == 1 ){
     $class .= ' post-list-show';
 }
-if(has_post_thumbnail()){
-	$large_image_url = wp_get_attachment_image_src( get_post_thumbnail_id($post->ID), 'large');
-	$post_img = $large_image_url[0];
-}else{
-	$post_img = DEFAULT_FEATURE_IMAGE();
+
+// get article image
+$content = $post->post_content;
+$img_preg = "/<img (.*?)src=\"(.+?)\".*?>/";
+preg_match($img_preg, $content, $img_src);
+$img_count = count($img_src) - 1;
+if (isset($img_src[$img_count])) {
+    $img_val = $img_src[$img_count];
 }
+if (!empty($img_val)) {
+    // got image from article
+    $post_img = $img_val;
+} else {
+    if(has_post_thumbnail()){
+        $large_image_url = wp_get_attachment_image_src( get_post_thumbnail_id($post->ID), 'large');
+
+    }else{
+        $post_img = DEFAULT_FEATURE_IMAGE();
+    }
+}
+
+
 $the_cat = get_the_category();
 // 摘要字数限制
 
@@ -40,7 +56,7 @@ $the_cat = get_the_category();
 ?>
 	<article class="post post-list-thumb <?php echo $class; ?>" itemscope="" itemtype="http://schema.org/BlogPosting">
 		<div class="post-thumb">
-			<a href="<?php the_permalink(); ?>"><img class="lazyload" src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.1/img/svg/loader/orange.progress-bar-stripe-loader.svg" data-src="<?php echo $post_img; ?>"></a>
+			<a href="<?php the_permalink(); ?>"><img class="lazyload" src="https://cdn.jsdelivr.net/gh/moezx/cdn@3.0.1/img/svg/loader/orange.progress-bar-stripe-loader.svg" data-src="<?php echo post_thumbnail(); ?>"></a>
 		</div><!-- thumbnail-->
 		<div class="post-content-wrap">
 			<div class="post-content">

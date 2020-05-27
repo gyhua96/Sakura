@@ -1903,4 +1903,33 @@ function permalink_tip()
     }
 }
 add_action('admin_notices', 'permalink_tip');
+
+function post_thumbnail()
+{
+    global $post;
+    $img_id = get_post_thumbnail_id();
+    $img_url = wp_get_attachment_image_src($img_id, array(720, 435));
+    if (is_array($img_url)) {
+        $img_url = $img_url[0];
+    }
+    if (has_post_thumbnail()) {
+        $img_url = $img_url;
+    } else {
+        $content = $post->post_content;
+        $img_preg = "/<img (.*?)src=\"(.+?)\".*?>/";
+        preg_match($img_preg, $content, $img_src);
+        $img_count = count($img_src) - 1;
+        if (isset($img_src[$img_count])) {
+            $img_val = $img_src[$img_count];
+        }
+        if (!empty($img_val)) {
+            $img_url = $img_val;
+        } else {
+            $img_url = DEFAULT_FEATURE_IMAGE();
+
+        }
+    }
+    return $img_url;
+}
+
 //code end
